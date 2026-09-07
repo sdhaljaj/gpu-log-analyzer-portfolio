@@ -1,4 +1,3 @@
-#Mission 08
 from pathlib import Path
 import argparse
 import json
@@ -21,9 +20,9 @@ def read_log(path: Path) -> str:
 def count_levels(levels: list[str]) -> dict[str, int]:
     """Return counts for known normalized log levels."""
     counts = {
-    "ERROR": 0,
-    "WARNING": 0,
-    "INFO": 0,
+        "ERROR": 0,
+        "WARNING": 0,
+        "INFO": 0,
     }
     for level in levels:
         normalized_level = normalize_level(level)
@@ -51,31 +50,31 @@ def analyze_log_file(path: Path) -> dict[str, int]:
     """Read a UTF-8 log file and return known-level counts."""
     return analyze_log_text(read_log(path))
 
-#Mission 10A
+
 def format_summary(counts: dict[str, int]) -> str:
     """Return the known-level counts in a stable three-line report."""
-   
-    summary = "ERROR: "+ str(counts["ERROR"]) + "\n" + \
-        "WARNING: " + str(counts["WARNING"]) + "\n" + \
-        "INFO: " + str(counts["INFO"])
-    return summary
+    lines = [
+        f'ERROR: {counts["ERROR"]}',
+        f'WARNING: {counts["WARNING"]}',
+        f'INFO: {counts["INFO"]}',
+    ]
+    return "\n".join(lines)
 
-#Mission 13
 
 def exit_code_for_counts(counts: dict[str, int]) -> int:
     """Return 1 when ERROR entries exist; otherwise return 0."""
     if counts["ERROR"] > 0:
         return 1
-    else:
-        return 0
+    return 0
 
-#Mission 15
+
 def format_json_summary(counts: dict[str, int]) -> str:
-    """Returns  returns a JSON string """
+    """Return a JSON string."""
     return json.dumps(counts)
 
-#Mission 19
+
 def write_report(path: Path, report: str) -> None:
+    """Write a report with a trailing newline as UTF-8 text."""
     path.write_text(report + "\n", encoding="utf-8")
 
 
@@ -86,13 +85,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--output")
     args = parser.parse_args(argv)
-    #Mission17
     try:
         counts = analyze_log_file(Path(args.log_path))
     except FileNotFoundError:
         print(f"ERROR: log file not found: {args.log_path}", file=sys.stderr)
         return 2
-    
     if args.json:
         report = format_json_summary(counts)
     else:
@@ -102,8 +99,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(report)
     return exit_code_for_counts(counts)
-  
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
