@@ -1,4 +1,4 @@
-from src.gpu_log_analyzer import analyze_log_text, extract_level, analyze_log_file, format_summary, main, exit_code_for_counts, format_json_summary, write_report
+from src.gpu_log_analyzer import analyze_log_text, extract_level, analyze_log_file, format_summary, main, exit_code_for_counts, format_json_summary, write_report, count_levels
 import pytest
 import json
 
@@ -133,6 +133,17 @@ def test_json_output_file(tmp_path, capsys):
     assert json.loads(report_path.read_text(encoding = 'utf-8')) == {'ERROR' : 1, 'WARNING' :  1, 'INFO' : 1}
 
 
+def test_count_levels_accepts_raw_levels():
+    levels = [ " eRRor ", "WARNING", "  warning", "info  ", " Info  ", "Debug "]
+    result = count_levels(levels)
+    assert result == {"ERROR": 1, "WARNING": 2, "INFO": 2}
+
+
+def test_count_levels_does_not_modify_input():
+    levels = [ " eRRor ", "WARNING", "  warning", "info  ", " Info  ", "Debug "]
+    original_levels = levels.copy()
+    count_levels(levels)
+    assert levels == original_levels
 
 
 
