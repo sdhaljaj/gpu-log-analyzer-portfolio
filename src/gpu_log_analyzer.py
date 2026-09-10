@@ -17,18 +17,26 @@ def read_log(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def count_levels(levels: list[str]) -> dict[str, int]:
+def _count_normalized_levels(levels: list[str]) -> dict[str, int]:
     """Return counts for known normalized log levels."""
     counts = {
-        "ERROR": 0,
-        "WARNING": 0,
-        "INFO": 0,
+            "ERROR": 0,
+            "WARNING": 0,
+            "INFO": 0,
     }
     for level in levels:
-        normalized_level = normalize_level(level)
-        if normalized_level in counts:
-            counts[normalized_level] += 1
+        if level in counts:
+            counts[level] += 1
     return counts
+
+
+def count_levels(levels: list[str]) -> dict[str, int]:
+    """Return counts for known log levels from raw input."""
+    normalized_levels = []
+    for level in levels:
+        normalized_level = normalize_level(level)
+        normalized_levels.append(normalized_level)
+    return _count_normalized_levels(normalized_levels)
 
 
 def extract_level(line: str) -> str:
@@ -43,7 +51,7 @@ def analyze_log_text(text: str) -> dict[str, int]:
     levels = []
     for line in text.splitlines():
         levels.append(extract_level(line))
-    return count_levels(levels)
+    return _count_normalized_levels(levels)
 
 
 def analyze_log_file(path: Path) -> dict[str, int]:

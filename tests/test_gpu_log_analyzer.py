@@ -15,6 +15,10 @@ def test_without_colon_in_line():
     assert extract_level(line) == "UNKNOWN"
 
 
+def test_extract_level_returns_normalized_level():
+    assert extract_level(" error : GPU failure") == "ERROR"
+
+
 def test_mixed_levels():
     text = "Error : GPU fallenoff the bus\n \
     INfo  : ECC is off\n \
