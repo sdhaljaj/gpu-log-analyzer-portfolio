@@ -1,6 +1,18 @@
-from src.gpu_log_analyzer import analyze_log_text, extract_level, analyze_log_file, format_summary, main, exit_code_for_counts, format_json_summary, write_report, count_levels
-import pytest
 import json
+
+import pytest
+
+from src.gpu_log_analyzer import (
+    analyze_log_file,
+    analyze_log_text,
+    count_levels,
+    exit_code_for_counts,
+    extract_level,
+    format_json_summary,
+    format_summary,
+    main,
+    write_report,
+)
 
 
 def test_known_levels():
@@ -49,14 +61,15 @@ def test_analyze_missing_file(tmp_path):
         analyze_log_file(path)
 
 
-#Mission 09
 def test_format_summary_mixed():
     summary = {"INFO" : 3, "WARNING" : 1, "ERROR" : 4}
     assert format_summary(summary) == "ERROR: 4\nWARNING: 1\nINFO: 3"
 
+
 def test_format_summary_zero():
     summary = {"WARNING" : 0, "INFO" : 0, "ERROR" : 0}
     assert format_summary(summary) == "ERROR: 0\nWARNING: 0\nINFO: 0"
+
 
 def test_main(tmp_path,capsys):
     path = tmp_path / "example.txt"
@@ -64,16 +77,26 @@ def test_main(tmp_path,capsys):
     exit_code = main([str(path)])
     captured = capsys.readouterr()
     assert captured.out ==  "ERROR: 1\nWARNING: 1\nINFO: 1\n"
-    assert exit_code == 1 # edited in mission 13
+    assert exit_code == 1
 
-#Mission 13
-def test_exit_code_for_counts_all_zero():
-    counts = {"INFO" : 0, "WARNING" : 0, "ERROR" : 0}
-    assert exit_code_for_counts(counts) == 0
 
-def test_exit_code_for_counts():
-    counts = {"INFO" : 3, "WARNING" : 1, "ERROR" : 4}
-    assert exit_code_for_counts(counts) == 1
+@pytest.mark.parametrize(
+    "counts, expected_code",
+    [
+        pytest.param(
+            {"INFO": 0, "WARNING": 0, "ERROR": 0},
+            0,
+            id="no-errors",
+        ),
+        pytest.param(
+            {"INFO": 3, "WARNING": 1, "ERROR": 4},
+            1,
+            id="errors-present",
+        ),
+    ],
+)
+def test_exit_code_for_counts(counts, expected_code):
+    assert exit_code_for_counts(counts) == expected_code
 
 
 def test_main_no_error(tmp_path,capsys):
@@ -82,13 +105,13 @@ def test_main_no_error(tmp_path,capsys):
     exit_code = main([str(path)])
     captured = capsys.readouterr()
     assert captured.out ==  "ERROR: 0\nWARNING: 1\nINFO: 1\n"
-    assert exit_code == 0 # edited in mission 13
+    assert exit_code == 0
 
-#Mission14
 
 def test_format_json_summary():
     counts = {"INFO" : 3, "WARNING" : 1, "ERROR" : 4}
     assert counts == json.loads(format_json_summary(counts))
+
 
 def test_main_json_summary(tmp_path, capsys):
     path = tmp_path / "example.txt"
@@ -98,7 +121,6 @@ def test_main_json_summary(tmp_path, capsys):
     assert json.loads(captured.out) == {'ERROR': 1, 'WARNING': 1, 'INFO': 1}
     assert exit_code == 1
 
-#Mission 17
 
 def test_main_missing_log_file(tmp_path, capsys):
     path = tmp_path / "example.txt"
@@ -109,11 +131,11 @@ def test_main_missing_log_file(tmp_path, capsys):
     assert exit_code == 2
 
 
-#Mission 19
 def test_write_report(tmp_path):
     path = tmp_path / "report.txt"
     write_report(path, "ERROR: 1")
     assert path.read_text(encoding = 'utf-8') == "ERROR: 1\n"
+
 
 def test_output_file(tmp_path, capsys):
     logfile_path = tmp_path / "logfile.txt"
