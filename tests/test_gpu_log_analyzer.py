@@ -131,6 +131,16 @@ def test_main_missing_log_file(tmp_path, capsys):
     assert exit_code == 2
 
 
+def test_main_invalid_utf8_log_file(tmp_path, capsys):
+    path = tmp_path / "invalid.log"
+    path.write_bytes(b"\xff")
+    exit_code = main([str(path)])
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == f"ERROR: log file is not valid UTF-8: {path}\n"
+    assert exit_code == 3
+
+
 def test_write_report(tmp_path):
     path = tmp_path / "report.txt"
     write_report(path, "ERROR: 1")

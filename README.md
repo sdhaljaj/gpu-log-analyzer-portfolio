@@ -67,6 +67,7 @@ It expects a simple `LEVEL: message` format and does not yet parse timestamps, G
 - Exit code `0`: the log was read and contains no ERROR entries.
 - Exit code `1`: the log was read and contains one or more ERROR entries.
 - Exit code `2`: the requested log file does not exist.
+- Exit code `3`: the log file is not in valid UTF-8 format.
 
 
 ```powershell
@@ -76,7 +77,7 @@ echo $LASTEXITCODE
 
 
 For exit codes `0` and `1`, the tool prints the ERROR, WARNING, and INFO counts.
-For exit code `2`, it writes the missing-file diagnostic to standard error and
+For exit codes `2` and `3`, the tool writes the diagnostic to standard error and
 does not print a report.
 
 ## Output file mode

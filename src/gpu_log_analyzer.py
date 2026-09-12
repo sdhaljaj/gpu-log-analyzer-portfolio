@@ -98,6 +98,10 @@ def main(argv: list[str] | None = None) -> int:
     except FileNotFoundError:
         print(f"ERROR: log file not found: {args.log_path}", file=sys.stderr)
         return 2
+    except UnicodeDecodeError:
+        print(f"ERROR: log file is not valid UTF-8: {args.log_path}", file=sys.stderr)
+        return 3
+
     if args.json:
         report = format_json_summary(counts)
     else:
